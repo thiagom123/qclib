@@ -153,7 +153,8 @@ class LdmcuApprox(Gate):
                     control_list = np.array(range(0, extra_q+1))
                     theta = signal * np.pi / param
                     rx_matrix = np.array([[np.cos(theta/2) , (-1j)*np.sin(theta/2)], [(-1j)*np.sin(theta/2), np.cos(theta/2)]])
-                    Ldmcsu.ldmcsu(gate_circ, rx_matrix, control_list, pair.target+extra_q)
+                    #Ldmcsu.ldmcsu(gate_circ, rx_matrix, control_list, pair.target+extra_q)
+                    gate_circ.mcrx(theta = theta, q_controls=control_list, q_target=pair.target+extra_q )
                 else:
                     gate_circ.crx(signal * np.pi / param, pair.control+extra_q, pair.target+extra_q)
 
