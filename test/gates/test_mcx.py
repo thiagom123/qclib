@@ -263,6 +263,33 @@ class TestMcxVchainDirty(TestCase):
                 ctrl_state=ctrl_state,
             )
 
+    def _multiple_toffoli(self, num_target_qubit):
+        """
+        Create a circuit with multiple toffoli gates
+        """
+        num_ctrl=2
+        circ = QuantumCircuit(num_ctrl+num_target_qubit)
+        controls = list(np.arange(num_ctrl))
+        for i in range(num_target_qubit):
+            circ.mcx(controls, [num_ctrl+i])
+        return circ
+    
+    def test_toffoli_multi_target(self):
+        """
+        Test toffoli_multi_target method implementing both sides (side = None)
+        """
+        for num_targets in range(1, 6):
+            
+            #mcx_vchain implementation
+            circ1= McxVchainDirty.toffoli_multi_target(num_targets=num_targets)
+
+            #multiple toffoli gates with qiskit
+            circ2 = self._multiple_toffoli(num_targets)
+
+            r1 = Operator(circ1).data
+            r2 = Operator(circ2).data
+            self.assertTrue(np.allclose(r1, r2))
+
     def test_mcx_v_chain_3targets(self):
         """Test multiple targets McxVchainDirty"""
 

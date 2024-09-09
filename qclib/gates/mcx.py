@@ -83,38 +83,51 @@ class McxVchainDirty(Gate):
         if side == "l":
             circuit.name = 'toff_left'
             layers = int(np.ceil(np.log2(num_targets)))
-            for l in range(layers, 0, -1):
-                last_control = 2**(l-1)
-                last_target = int(min(2**l, num_targets))
-                for target in range(last_target+1, last_control+1, -1):
-                    ctrl_aux = target-last_control
-                    circuit.cx(ctrl_aux, target)
-            #for i in range(num_targets - 1):
-            #   circuit.cx(size - i - 2, size - i - 1)        
+            #for l in range(layers, 0, -1):
+            #    last_control = 2**(l-1)
+            #    last_target = int(min(2**l, num_targets))
+            #    for target in range(last_target+1, last_control+1, -1):
+            #        ctrl_aux = target-last_control
+            #        circuit.cx(ctrl_aux, target)
+            for i in range(num_targets - 1):
+               circuit.cx(size - i - 2, size - i - 1)        
             circuit.ccx(0, 1, 2)
             return circuit
 
         elif side == "r":
             circuit.name = 'toff_right'
             circuit.ccx(0, 1, 2)
+            for i in range(num_targets - 1):
+                circuit.cx(i + 2, i + 3)
+            #layers = int(np.ceil(np.log2(num_targets)))
+            #for l in range(1, layers+1, +1):
+            #    last_control = int(2**(l-1))
+            #    last_target = int(min(2**l, num_targets))
+            #    for target in range(last_control+1, last_target+1):
+            #        ctrl_aux = target-last_control
+            #        circuit.cx(ctrl_aux, target) 
+            return circuit
+
+        elif side is None:
+            circuit.name = 'toff_l_and_r'
             #for i in range(num_targets - 1):
-                #circuit.cx(i + 2, i + 3)
+            #    circuit.cx(size - i - 2, size - i - 1)
             layers = int(np.ceil(np.log2(num_targets)))
+            for l in range(layers, 0, -1):
+                last_control = 2**(l-1)
+                last_target = int(min(2**l, num_targets))
+                for target in range(last_target+1, last_control+1, -1):
+                    ctrl_aux = target-last_control
+                    circuit.cx(ctrl_aux, target)
+            circuit.ccx(0, 1, 2)
+            #for i in range(num_targets - 1):
+            #    circuit.cx(i + 2, i + 3)
             for l in range(1, layers+1, +1):
                 last_control = int(2**(l-1))
                 last_target = int(min(2**l, num_targets))
                 for target in range(last_control+1, last_target+1):
                     ctrl_aux = target-last_control
                     circuit.cx(ctrl_aux, target) 
-            return circuit
-
-        elif side is None:
-            circuit.name = 'toff_l_and_r'
-            for i in range(num_targets - 1):
-                circuit.cx(size - i - 2, size - i - 1)
-            circuit.ccx(0, 1, 2)
-            for i in range(num_targets - 1):
-                circuit.cx(i + 2, i + 3)
             return circuit
 
     def _define(self):
